@@ -1,24 +1,59 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { getUser, saveUser } from "@/lib/auth"
+import { createUser } from "@/lib/auth"
 
 export default function LoginPage() {
-  const [role, setRole] = useState("vehicle-owner")
+  const router = useRouter()
+  const [role, setRole] = useState("vehicle_owner")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [vehicleNumber, setVehicleNumber] = useState("")
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError("")
     setLoading(true)
-    // Handle login logic here
-    setTimeout(() => setLoading(false), 1000)
+
+    try {
+      // In a real app, validate credentials with backend
+      // For demo purposes, we create/login any user
+      const userRole = role === "vehicle_owner" ? "vehicle_owner" : "traffic_officer"
+      
+      // Check if user exists
+      let user = getUser()
+      if (user?.email !== email) {
+        // Create new user if doesn't exist
+        user = createUser(
+          email,
+          email.split("@")[0],
+          userRole,
+          userRole === "vehicle_owner" ? vehicleNumber : undefined
+        )
+        saveUser(user)
+      }
+
+      // Redirect based on role
+      if (userRole === "vehicle_owner") {
+        router.push("/owner-dashboard")
+      } else {
+        router.push("/dashboard")
+      }
+    } catch (err) {
+      setError("Login failed. Please try again.")
+      console.error("[v0] Login error:", err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -47,6 +82,12 @@ export default function LoginPage() {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="rounded-lg bg-red-50 border border-red-200 p-3">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            )}
+
             {/* Role Selection */}
             <div className="space-y-3">
               <Label className="text-sm font-semibold text-slate-700">

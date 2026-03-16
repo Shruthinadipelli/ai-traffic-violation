@@ -1,25 +1,70 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { getUser, saveUser, createUser } from "@/lib/auth"
+import { getPayments, savePayment } from "@/lib/payment"
+import type { PaymentRecord } from "@/lib/types"
 
 export default function RegisterPage() {
-  const [role, setRole] = useState("vehicle-owner")
+  const router = useRouter()
+  const [role, setRole] = useState("vehicle_owner")
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [vehicleNumber, setVehicleNumber] = useState("")
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError("")
     setLoading(true)
-    // Handle registration logic here
-    setTimeout(() => setLoading(false), 1000)
+
+    try {
+      // Check if user already exists
+      const existingUser = getUser()
+      if (existingUser?.email === email) {
+        setError("User with this email already exists")
+        setLoading(false)
+        return
+      }
+
+      const userRole = role === "vehicle_owner" ? "vehicle_owner" : "traffic_officer"
+
+      // Create new user
+      const newUser = createUser(
+        email,
+        name,
+        userRole,
+        userRole === "vehicle_owner" ? vehicleNumber : undefined
+      )
+      saveUser(newUser)
+
+      // For vehicle owners, initialize payment records for their vehicle from violations
+      if (userRole === "vehicle_owner" && vehicleNumber) {
+        const payments = getPayments()
+        // Initialize payment records for this vehicle (in real app, fetch from API)
+        // For now, this will be empty and payments will be created as violations are matched
+      }
+
+      // Redirect based on role
+      if (userRole === "vehicle_owner") {
+        router.push("/owner-dashboard")
+      } else {
+        router.push("/dashboard")
+      }
+    } catch (err) {
+      setError("Registration failed. Please try again.")
+      console.error("[v0] Registration error:", err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -48,6 +93,12 @@ export default function RegisterPage() {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="rounded-lg bg-red-50 border border-red-200 p-3">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            )}
+
             {/* Name */}
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-semibold text-slate-700">

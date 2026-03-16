@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import useSWR from "swr"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
@@ -10,6 +11,7 @@ import { AnalyticsCharts } from "@/components/dashboard/analytics-charts"
 import { ArchitectureView } from "@/components/dashboard/architecture-view"
 import { ChallanPanel } from "@/components/dashboard/challan-panel"
 import { ApiExplorer } from "@/components/dashboard/api-explorer"
+import { getUser } from "@/lib/auth"
 import type { DashboardData, Violation, ChallanRecord, ViolationStatus } from "@/lib/types"
 
 // SWR fetcher that returns JSON from our Next.js API routes
@@ -31,7 +33,21 @@ interface ChallansResponse {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState("overview")
+
+  // Check authentication and role
+  useEffect(() => {
+    const user = getUser()
+    if (!user) {
+      router.push("/login")
+      return
+    }
+    if (user.role !== "traffic_officer") {
+      router.push("/owner-dashboard")
+      return
+    }
+  }, [router])
 
   // Fetch dashboard data (stats + charts) from GET /api/dashboard
   const {
