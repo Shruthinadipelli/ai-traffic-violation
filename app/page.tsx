@@ -47,14 +47,14 @@ export default function LandingPage() {
             </div>
 
             <div className="flex flex-wrap gap-4">
-              <Link href="/dashboard">
+              <Link href="/login">
                 <Button className="h-12 px-8 text-lg font-semibold bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800">
-                  VIEW VIOLATIONS DASHBOARD
+                  LOGIN
                 </Button>
               </Link>
-              <Link href="/login">
+              <Link href="/register">
                 <Button variant="outline" className="h-12 px-8 text-lg font-semibold border-2 border-blue-400 text-white hover:bg-blue-500/10">
-                  GET STARTED
+                  REGISTER
                 </Button>
               </Link>
             </div>
