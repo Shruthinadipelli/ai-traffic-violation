@@ -14,6 +14,7 @@ interface PaymentModalProps {
 
 export function PaymentModal({ violation, challan, onClose }: PaymentModalProps) {
   const [marking, setMarking] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
 
   if (!violation || !challan) return null
 
@@ -23,12 +24,13 @@ export function PaymentModal({ violation, challan, onClose }: PaymentModalProps)
       // Mark as paid in localStorage
       markAsPaid(challan.challanNumber, `TXN-${Date.now()}`)
       
-      // Close modal and trigger refresh
+      // Show success message then close
+      setShowSuccess(true)
       setTimeout(() => {
         onClose()
-        // Refresh the page to show updated status
+        // Refresh page to reflect payment status changes
         window.location.reload()
-      }, 500)
+      }, 1500)
     } catch (error) {
       console.error("[v0] Error marking as paid:", error)
       setMarking(false)
@@ -48,13 +50,27 @@ export function PaymentModal({ violation, challan, onClose }: PaymentModalProps)
 
         {/* Content */}
         <div className="px-6 py-8 space-y-6">
-          {/* Amount Display */}
-          <div className="rounded-lg bg-gradient-to-br from-blue-50 to-slate-50 p-6 text-center border border-blue-200">
-            <p className="text-sm font-semibold text-slate-600">Amount to Pay</p>
-            <p className="mt-2 text-4xl font-bold text-blue-600">₹{challan.fine}</p>
-          </div>
+          {/* Success Message */}
+          {showSuccess && (
+            <div className="rounded-lg bg-gradient-to-br from-emerald-50 to-slate-50 p-4 border border-emerald-200">
+              <div className="flex items-center gap-3">
+                <svg className="h-5 w-5 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <p className="text-sm font-semibold text-emerald-800">Payment marked as confirmed!</p>
+              </div>
+            </div>
+          )}
 
-          {/* QR Code */}
+          {/* Amount Display */}
+          {!showSuccess && (
+            <>
+              <div className="rounded-lg bg-gradient-to-br from-blue-50 to-slate-50 p-6 text-center border border-blue-200">
+                <p className="text-sm font-semibold text-slate-600">Amount to Pay</p>
+                <p className="mt-2 text-4xl font-bold text-blue-600">₹{challan.fine}</p>
+              </div>
+
+              {/* QR Code */}
           <div className="flex flex-col items-center gap-4">
             <div className="rounded-lg bg-white p-4 border-2 border-slate-300">
               <QRCode
@@ -69,18 +85,20 @@ export function PaymentModal({ violation, challan, onClose }: PaymentModalProps)
             </p>
           </div>
 
-          {/* UPI Details */}
-          <div className="rounded-lg bg-slate-50 p-4 space-y-2 text-sm">
-            <p>
-              <span className="font-semibold text-slate-700">UPI ID:</span> traffic@upi
-            </p>
-            <p>
-              <span className="font-semibold text-slate-700">Beneficiary:</span> TrafficEye
-            </p>
-            <p>
-              <span className="font-semibold text-slate-700">Amount:</span> ₹{challan.fine}
-            </p>
-          </div>
+              {/* UPI Details */}
+              <div className="rounded-lg bg-slate-50 p-4 space-y-2 text-sm">
+                <p>
+                  <span className="font-semibold text-slate-700">UPI ID:</span> traffic@upi
+                </p>
+                <p>
+                  <span className="font-semibold text-slate-700">Beneficiary:</span> TrafficEye
+                </p>
+                <p>
+                  <span className="font-semibold text-slate-700">Amount:</span> ₹{challan.fine}
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Footer */}

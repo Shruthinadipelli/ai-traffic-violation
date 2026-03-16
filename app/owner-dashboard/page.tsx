@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { getUser, clearUser } from "@/lib/auth"
@@ -16,8 +16,9 @@ export default function OwnerDashboard() {
   const [user, setUser] = useState<User | null>(null)
   const [myViolations, setMyViolations] = useState<Violation[]>([])
   const [selectedViolation, setSelectedViolation] = useState<string | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
-  useEffect(() => {
+  const loadData = useCallback(() => {
     const currentUser = getUser()
     if (!currentUser) {
       router.push("/login")
@@ -35,6 +36,16 @@ export default function OwnerDashboard() {
     )
     setMyViolations(filtered)
   }, [router])
+
+  useEffect(() => {
+    loadData()
+  }, [loadData, refreshKey])
+
+  // Refresh data when modal closes to reflect payment status updates
+  const handleModalClose = useCallback(() => {
+    setSelectedViolation(null)
+    setRefreshKey((prev) => prev + 1)
+  }, [])
 
   const handleLogout = () => {
     clearUser()
@@ -195,20 +206,27 @@ export default function OwnerDashboard() {
                       )}
                     </div>
 
-                    {/* Action Button */}
-                    {paymentStatus === "unpaid" && challan && (
+                    {/* Action Buttons */}
+                    <div className="space-y-2">
                       <Button
                         onClick={() => setSelectedViolation(violation.id)}
                         className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-2 h-auto"
                       >
-                        Pay Fine
+                        Show QR Code
                       </Button>
-                    )}
-                    {paymentStatus === "paid" && (
-                      <div className="w-full py-2 text-center text-xs font-semibold text-emerald-700 bg-emerald-50 rounded border border-emerald-200">
-                        Payment Completed
-                      </div>
-                    )}
+                      <Button
+                        onClick={() => router.push(`/challan/${violation.id}`)}
+                        variant="outline"
+                        className="w-full text-slate-700 border-slate-300 hover:bg-slate-50 font-semibold py-2 h-auto"
+                      >
+                        Open Challan Link
+                      </Button>
+                      {paymentStatus === "paid" && (
+                        <div className="w-full py-2 text-center text-xs font-semibold text-emerald-700 bg-emerald-50 rounded border border-emerald-200">
+                          Payment Completed
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )
@@ -222,7 +240,7 @@ export default function OwnerDashboard() {
         <PaymentModal
           violation={myViolations.find((v) => v.id === selectedViolation)}
           challan={seedChallans.find((c) => c.violationId === selectedViolation)}
-          onClose={() => setSelectedViolation(null)}
+          onClose={handleModalClose}
         />
       )}
     </div>

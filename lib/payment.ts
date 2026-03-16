@@ -1,11 +1,32 @@
 import type { PaymentRecord } from "./types"
+import { seedChallans } from "./seed-data"
 
 const PAYMENT_STORAGE_KEY = "traffic_eye_payments"
+
+// Initialize payment records from seed data on first load
+function initializePaymentsFromSeed(): PaymentRecord[] {
+  return seedChallans.map((challan) => ({
+    challanNumber: challan.challanNumber,
+    violationId: challan.violationId,
+    plate: challan.plate,
+    amount: challan.fine,
+    paid_at: challan.status === "paid" ? new Date(0).toISOString() : null,
+    payment_method: challan.status === "paid" ? "upi" : null,
+  }))
+}
 
 export function getPayments(): PaymentRecord[] {
   if (typeof window === "undefined") return []
   const stored = localStorage.getItem(PAYMENT_STORAGE_KEY)
-  return stored ? JSON.parse(stored) : []
+  
+  if (!stored) {
+    // First time - initialize from seed data
+    const initial = initializePaymentsFromSeed()
+    localStorage.setItem(PAYMENT_STORAGE_KEY, JSON.stringify(initial))
+    return initial
+  }
+  
+  return JSON.parse(stored)
 }
 
 export function savePayment(payment: PaymentRecord): void {
