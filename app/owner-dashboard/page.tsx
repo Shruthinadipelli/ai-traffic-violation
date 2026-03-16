@@ -15,7 +15,7 @@ export default function OwnerDashboard() {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [myViolations, setMyViolations] = useState<Violation[]>([])
-  const [selectedViolation, setSelectedViolation] = useState<string | null>(null)
+  const [selectedViolationId, setSelectedViolationId] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
   const loadData = useCallback(() => {
@@ -43,7 +43,7 @@ export default function OwnerDashboard() {
 
   // Refresh data when modal closes to reflect payment status updates
   const handleModalClose = useCallback(() => {
-    setSelectedViolation(null)
+    setSelectedViolationId(null)
     setRefreshKey((prev) => prev + 1)
   }, [])
 
@@ -209,7 +209,7 @@ export default function OwnerDashboard() {
                     {/* Action Buttons */}
                     <div className="space-y-2">
                       <Button
-                        onClick={() => setSelectedViolation(violation.id)}
+                        onClick={() => setSelectedViolationId(violation.id)}
                         className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-2 h-auto"
                       >
                         Show QR Code
@@ -236,10 +236,10 @@ export default function OwnerDashboard() {
       </main>
 
       {/* Payment Modal */}
-      {selectedViolation && (
+      {selectedViolationId && (
         <PaymentModal
-          violation={myViolations.find((v) => v.id === selectedViolation)}
-          challan={seedChallans.find((c) => c.violationId === selectedViolation)}
+          violation={myViolations.find((v) => v.id === selectedViolationId)}
+          challan={seedChallans.find((c) => c.violationId === selectedViolationId)}
           onClose={handleModalClose}
         />
       )}
