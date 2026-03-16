@@ -150,40 +150,47 @@ export default function OwnerDashboard() {
 
                   {/* Card Content */}
                   <div className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <p className="text-xs font-semibold text-slate-500 uppercase">
-                          {getViolationLabel(violation.type)}
+                    {/* Header with Status Badge */}
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                          {violation.plate}
                         </p>
-                        <p className="text-lg font-bold text-slate-900 mt-1">
-                          Fine: ₹{fine}
+                        <p className="text-sm font-semibold text-slate-900 mt-1">
+                          {getViolationLabel(violation.type)}
                         </p>
                       </div>
                       <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                        className={`ml-2 shrink-0 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${
                           paymentStatus === "paid"
                             ? "bg-emerald-100 text-emerald-800"
                             : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {paymentStatus === "paid" ? "Paid" : "Unpaid"}
+                        {paymentStatus === "paid" ? "Paid" : "Not Paid"}
                       </span>
                     </div>
 
+                    {/* Fine Amount */}
+                    <div className="mb-4 p-3 rounded-lg bg-blue-50 border border-blue-200">
+                      <p className="text-xs text-blue-600 font-semibold">Fine Amount</p>
+                      <p className="text-2xl font-bold text-blue-700 mt-1">₹{fine}</p>
+                    </div>
+
                     {/* Violation Details */}
-                    <div className="space-y-2 mb-4 text-sm text-slate-600">
+                    <div className="space-y-2 mb-4 text-xs text-slate-600">
                       <p>
-                        <span className="font-semibold">Camera:</span> {violation.camera}
+                        <span className="font-semibold text-slate-700">Camera:</span> {violation.camera}
                       </p>
                       <p>
-                        <span className="font-semibold">Time:</span> {violation.time}
+                        <span className="font-semibold text-slate-700">Time:</span> {violation.time}
                       </p>
                       <p>
-                        <span className="font-semibold">Confidence:</span> {(violation.confidence * 100).toFixed(0)}%
+                        <span className="font-semibold text-slate-700">Confidence:</span> {(violation.confidence * 100).toFixed(0)}%
                       </p>
                       {violation.speed && (
                         <p>
-                          <span className="font-semibold">Speed:</span> {violation.speed} km/h (Limit: {violation.limit} km/h)
+                          <span className="font-semibold text-slate-700">Speed:</span> {violation.speed} km/h (Limit: {violation.limit} km/h)
                         </p>
                       )}
                     </div>
@@ -192,13 +199,13 @@ export default function OwnerDashboard() {
                     {paymentStatus === "unpaid" && challan && (
                       <Button
                         onClick={() => setSelectedViolation(violation.id)}
-                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold"
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-2 h-auto"
                       >
-                        Pay Now
+                        Pay Fine
                       </Button>
                     )}
                     {paymentStatus === "paid" && (
-                      <div className="w-full py-2 text-center text-sm font-semibold text-emerald-600 bg-emerald-50 rounded">
+                      <div className="w-full py-2 text-center text-xs font-semibold text-emerald-700 bg-emerald-50 rounded border border-emerald-200">
                         Payment Completed
                       </div>
                     )}
