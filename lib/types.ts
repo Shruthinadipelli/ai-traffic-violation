@@ -50,3 +50,24 @@ export interface DashboardData {
   challans: ChallanRecord[]
   charts: ChartData
 }
+
+export type UserRole = "vehicle_owner" | "traffic_officer"
+
+export interface User {
+  id: string
+  name: string
+  email: string
+  role: UserRole
+  vehicle_number?: string
+  created_at: string
+}
+
+export interface PaymentRecord {
+  challanNumber: string
+  violationId: string
+  plate: string
+  amount: number
+  paid_at: string | null
+  payment_method: "upi" | "card" | "cash" | null
+  upi_transaction_id?: string
+}
