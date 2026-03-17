@@ -32,7 +32,6 @@ class Config:
 
     # File Upload Settings
     UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "uploads")
-    INPUT_FOLDER = os.path.join(os.path.dirname(__file__), "input")
     MAX_CONTENT_LENGTH = 50 * 1024 * 1024  # 50 MB max upload
 
     # YOLO Model Settings

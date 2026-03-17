@@ -13,14 +13,13 @@ video_bp = Blueprint('video', __name__)
 @video_bp.route('', methods=['GET'])
 def serve_video():
     """
-    Serve the video file (red_light_violation.mp4) for browser playback.
+    Serve the video file (video.mp4) for browser playback.
     Returns the video with appropriate video/mp4 mimetype.
     """
     # Path to the video file in the input folder
-    video_path = os.path.join(
-        current_app.config.get('INPUT_FOLDER', 'backend/input'),
-        'video.mp4'
-    )
+    backend_dir = os.path.dirname(os.path.abspath(__file__))
+    video_path = os.path.join(backend_dir, '..', 'input', 'video.mp4')
+    video_path = os.path.abspath(video_path)
     
     # Check if file exists
     if not os.path.exists(video_path):
