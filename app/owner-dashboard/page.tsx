@@ -10,6 +10,7 @@ import { getFineAmount, getViolationLabel } from "@/lib/violation-fines"
 import { getPaymentStatus } from "@/lib/payment"
 import type { User, Violation } from "@/lib/types"
 import { PaymentModal } from "@/components/owner/payment-modal"
+import { VideoPlayer } from "@/components/video/video-player"
 
 export default function OwnerDashboard() {
   const router = useRouter()
@@ -95,6 +96,11 @@ export default function OwnerDashboard() {
 
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8 lg:px-8">
+        {/* Video Player */}
+        <div className="mb-8">
+          <VideoPlayer />
+        </div>
+
         {/* Title Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-slate-900">My Violations</h2>

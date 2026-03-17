@@ -12,6 +12,7 @@ import { ArchitectureView } from "@/components/dashboard/architecture-view"
 import { ChallanPanel } from "@/components/dashboard/challan-panel"
 import { ApiExplorer } from "@/components/dashboard/api-explorer"
 import { getUser } from "@/lib/auth"
+import { VideoPlayer } from "@/components/video/video-player"
 import type { DashboardData, Violation, ChallanRecord, ViolationStatus } from "@/lib/types"
 
 // SWR fetcher that returns JSON from our Next.js API routes
@@ -149,6 +150,7 @@ export default function DashboardPage() {
           </TabsList>
 
           <TabsContent value="overview" className="flex flex-col gap-6">
+            <VideoPlayer />
             <StatsCards
               stats={dashboardData?.stats}
               isLoading={dashboardLoading}
