@@ -17,6 +17,8 @@ from routes.challans import challans_bp
 from routes.analytics import analytics_bp
 from routes.detection import detection_bp
 from routes.dashboard import dashboard_bp
+from routes.video import video_bp
+from utils.video_loader import ensure_video_file
 
 
 def create_app(config_name: str | None = None) -> Flask:
@@ -44,14 +46,19 @@ def create_app(config_name: str | None = None) -> Flask:
     app.register_blueprint(analytics_bp, url_prefix="/api/analytics")
     app.register_blueprint(detection_bp, url_prefix="/api/detection")
     app.register_blueprint(dashboard_bp, url_prefix="/api/dashboard")
+    app.register_blueprint(video_bp, url_prefix="/video")
 
     # Create tables if they don't exist
     with app.app_context():
         db.create_all()
 
-    # Ensure upload / QR directories exist
+    # Ensure upload / QR / input directories exist
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
     os.makedirs(app.config["QR_OUTPUT_DIR"], exist_ok=True)
+    os.makedirs(app.config["INPUT_FOLDER"], exist_ok=True)
+
+    # Ensure video file is available for serving
+    ensure_video_file(app.config["INPUT_FOLDER"])
 
     return app
 
